@@ -1,4 +1,4 @@
-const TaskList = ({ tasks}) => {
+const TaskList = ({ tasks,onTaskUpdate}) => {
     const handleTaskUpdate = async (task) => {
         const { _id, ...restOfTask } = task;
         const updatedTask = { ...restOfTask, status: 'completed' };
@@ -17,15 +17,14 @@ const TaskList = ({ tasks}) => {
             console.log('Error details:', errorDetails);
             throw new Error('Error updating task');
           }
+          onTaskUpdate(task._id);
         } catch (error) {
           console.error('Failed to update task', error);
         }
       };
 
       
-    if (tasks.length === 0) {
-      return <p>No tasks added yet!</p>;
-    }
+
   
     return (
       <ul>
