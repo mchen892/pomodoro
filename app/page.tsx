@@ -1,8 +1,15 @@
 "use client";
 
 import { useState, useEffect } from 'react';
-import ChatBox from './components/chatbox';
+import TaskForm from '../components/TaskForm';
+import CompletedTasks from '../components/CompletedTasks';
+import TaskApp from '../components/TaskApp';
 
+interface Task {
+  task: string;
+  status: string;
+  createdAt: string;
+}
 export default function Home() {
   const [seconds, setSeconds] = useState(1500);  // Start at 25 minutes (1500 seconds)
   const [isFiveMinuteTimer, setIsFiveMinuteTimer] = useState(false);  // Switch between 25-minute and 5-minute timers
@@ -20,6 +27,17 @@ export default function Home() {
   // Post-Pomodoro reflection
   const sessionFeedback = (feedback: string) => {
     console.log('Session Feedback:', feedback);  // Log feedback for now, or use it for future logic
+  };
+
+
+  
+ 
+  // Explicitly define tasks as an array of Task objects
+  const [tasks, setTasks] = useState<Task[]>([]);
+
+  // Handle adding a new task, typed explicitly
+  const handleNewTask = (newTask: Task) => {
+    setTasks([...tasks, newTask]);
   };
 
   // Effect to manage the countdown
@@ -65,6 +83,10 @@ export default function Home() {
     return () => clearInterval(interval);  // Clean up interval on unmount
   }, []);
 
+  useEffect(() => {
+    console.log("Updated tasks:", tasks);
+  }, [tasks]);
+
   // Function to format the time into minutes and seconds
   const formatTime = (seconds: number) => {
     const minutes = Math.floor(seconds / 60);
@@ -84,6 +106,8 @@ export default function Home() {
     return `${formattedHours}:${formattedMinutes}:${formattedSeconds} ${ampm}`;
   };
 
+
+
   return (
     <div className="flex flex-col items-center justify-center min-h-screen bg-light text-darkBlueGray">
       {/* Pomodoro Timer */}
@@ -94,49 +118,28 @@ export default function Home() {
         </h2>
       </div>
 
-      {/* Display Current Time */}
-      <p className="text-2xl mt-6">{formatCurrentTime(currentTime)}</p>
+      {/* Display current time below the countdown */}
+      <p className="text-3xl mt-8">
+        {formatCurrentTime(currentTime)}
+      </p>
+      <TaskForm onTaskSubmit={handleNewTask} />
+      <TaskApp tasks={tasks} />
+     
+      
+      
+      {/*<TaskApp tasks={tasks} />
+      <CompletedTasks/>*/}
+      <style jsx>{`
+        .blink {
+          animation: blink-animation 1s steps(2, start) infinite;
+        }
 
-      {/* Display Tasks */}
-      <div className="mt-8 bg-grayish p-4 rounded-lg w-80 shadow-sm">
-        <h2 className="text-2xl mb-2 font-semibold">Tasks</h2>
-        <ul className="list-disc ml-5">
-          {tasks.map((task, index) => (
-            <li key={index} className="text-lg">{task}</li>
-          ))}
-        </ul>
-      </div>
-
-      {/* ChatBox Component */}
-      <ChatBox
-        isChatOpen={isChatOpen}
-        setIsChatOpen={setIsChatOpen}
-        addTask={addTask}
-        sessionFeedback={sessionFeedback}
-      />
-
-      {/* Toggle Chat Button */}
-      {!isChatOpen && (
-        <button
-          onClick={() => setIsChatOpen(true)}
-          className="fixed right-4 bottom-4 bg-darkBlueGray text-white p-4 rounded-full shadow-lg"
-        >
-          💬
-        </button>
-      )}
-
-      {/* Spotify Widget in Bottom Left Corner */}
-      <div className="fixed left-4 bottom-4">
-        <iframe
-          style={{ borderRadius: '12px' }}
-          src="https://open.spotify.com/embed/playlist/3QPsci3WscAUEkfPHb5Cw6?utm_source=generator&theme=0"
-          width="300"
-          height="152"
-          frameBorder="0"
-          allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
-          loading="lazy"
-        ></iframe>
-      </div>
+        @keyframes blink-animation {
+          to {
+            visibility: hidden;
+          }
+        }
+      `}</style>
     </div>
   );
 }
