@@ -1,8 +1,7 @@
 import { useEffect, useState } from 'react';
 
 const CompletedTasks = () => {
-  const [completedTasks, setCompletedTasks] = useState([]); // No TypeScript here
-  const [error, setError] = useState(null); // Use null initially for errors
+  const [completedTasks, setCompletedTasks] = useState([]);
 
   useEffect(() => {
     const fetchCompletedTasks = async () => {
@@ -20,28 +19,17 @@ const CompletedTasks = () => {
         setError('Failed to fetch completed tasks.');
       }
     };
-
     fetchCompletedTasks();
   }, []);
 
-  if (error) {
-    return <p className="text-red-500">{error}</p>; // Display error if fetch fails
-  }
-
   return (
     <div className="completed-tasks">
-      {completedTasks.length === 0 ? (
-        <p>No completed tasks yet.</p>
-      ) : (
-        completedTasks.map((task) => (
-          <div key={task.id} className="task bg-gray-100 p-4 rounded-lg mb-4">
-            <p className="font-bold">{task.task || "Unnamed Task"}</p>
-            <p className="text-sm text-gray-500">
-              {task.createdAt ? new Date(task.createdAt).toLocaleString() : "No date available"}
-            </p>
-          </div>
-        ))
-      )}
+      {completedTasks.map((task) => (
+        <div key={task.id} className="task bg-gray-100 p-4 rounded-lg mb-4">
+          <p className="font-bold">{task.task}</p>
+          <p className="text-sm text-gray-500">{new Date(task.createdAt).toLocaleString()}</p>
+        </div>
+      ))}
     </div>
   );
 };
