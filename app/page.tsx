@@ -22,19 +22,16 @@ export default function Home() {
   const [tasks, setTasks] = useState<Task[]>([]);
   const [isChatOpen, setIsChatOpen] = useState(false);
 
-  const handleNewTask = (taskDescription: string) => {
-    const newTask: Task = {
-      id: Math.random().toString(36).substr(2, 9),
-      task: taskDescription,
-      status: "incomplete",
-      createdAt: new Date().toISOString(),
-      ipAddress: "127.0.0.1",
-    };
-    setTasks([...tasks, newTask]);
+  const handleNewTask = (newTask : Task) => {
+    // Here we assume the newTask contains the full task object (including _id from the database)
+    setTasks((prevTasks) => [...prevTasks, newTask]);
   };
+  
 
-  const removeTaskFromList = (taskId: string) => {
-    setTasks((prevTasks) => prevTasks.filter((task) => task.id !== taskId));
+  // Handle removing a task by its ID
+  const removeTaskFromList = (taskId) => {
+    // Remove the task with the given taskId from the state
+    setTasks(prevTasks => prevTasks.filter(task => task._id !== taskId));
   };
 
   useEffect(() => {
@@ -101,7 +98,7 @@ export default function Home() {
 
       {/* Task form and task display */}
       <TaskForm onTaskSubmit={handleNewTask} />
-      <TaskApp tasks={tasks} onTaskUpdate={removeTaskFromList} />
+      <TaskApp tasks={tasks}  onTaskUpdate={removeTaskFromList} />
       <CompletedTasks />
 
       {/* ChatBox component */}
