@@ -8,6 +8,22 @@ export default function Home() {
   const [isFiveMinuteTimer, setIsFiveMinuteTimer] = useState(false);  // Switch between 25-minute and 5-minute timers
   const [manualReset, setManualReset] = useState(false);  // Track manual resets via spacebar
 
+  const [prompt, setPrompt] = useState('');
+  const [result, setResult] = useState('');
+  const handleSubmit = async (e: { preventDefault: () => void; }) => {
+    e.preventDefault();
+
+    const response = await fetch('/api/openai', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ prompt }),
+    });
+
+    const data = await response.json();
+    setResult(data.result);
+  };
   // State for current time display
   const [currentTime, setCurrentTime] = useState(new Date());
 
@@ -84,6 +100,20 @@ export default function Home() {
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen bg-black text-white">
+      <div>
+      <h1>OpenAI GPT-3 Next.js Example</h1>
+      <form onSubmit={handleSubmit}>
+        <textarea
+          value={prompt}
+          onChange={(e) => setPrompt(e.target.value)}
+          placeholder="Enter a prompt"
+        />
+        <button type="submit">Generate Text</button>
+      </form>
+      <div>
+        <h2>Result:</h2>
+        <p>{result}</p>
+      </div>
       {/* Countdown Timer */}
       <h1 className="text-6xl font-bold">
         {formatTime(seconds)}
@@ -105,6 +135,5 @@ export default function Home() {
           }
         }
       `}</style>
-    </div>
-  );
-}
+      </div>
+      </div>
