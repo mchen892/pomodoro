@@ -41,7 +41,7 @@ const CompletedTasks = () => {
       <div className="completed-tasks">
         {completedTasks.slice().reverse().map((task) => (
           <div key={task.id} className="task bg-black-100 p-4 rounded-lg mb-4">
-            <p className="font-bold">{`${task.ipAddress} finished ${task.task}`}</p>
+            <p className="font-bold">{`${task.username} finished ${task.task}`}</p>
             <p className="text-sm text-black-500">{new Date(task.createdAt).toLocaleString()}</p>
           </div>
         ))}

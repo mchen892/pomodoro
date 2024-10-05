@@ -8,7 +8,7 @@ import CompletedTasks from "../components/CompletedTasks";
 
 interface Task {
   _id: any;
-  id: string;
+  username: string;
   task: string;
   status: string;
   createdAt: string;

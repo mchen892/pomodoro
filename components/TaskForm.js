@@ -3,6 +3,8 @@ import { useState } from 'react';
 const TaskForm = ({ onTaskSubmit }) => {
   const [task, setTask] = useState('');
 
+  
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!task) return;
@@ -13,7 +15,7 @@ const TaskForm = ({ onTaskSubmit }) => {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ task, id: Math.random().toString(36).substr(2, 9), status: 'pending' , createdAt: new Date() }),
+        body: JSON.stringify({ task,  status: 'pending' , createdAt: new Date() }),
       });
 
       if (!res.ok) {
