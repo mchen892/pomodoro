@@ -23,21 +23,16 @@ export default function Home() {
   const [tasks, setTasks] = useState<Task[]>([]);  // State for the task list
   const [isChatOpen, setIsChatOpen] = useState(false);  // State for chatbox open/close
 
-  // Handle adding a new task by creating a Task object from the task description
-  const handleNewTask = (taskDescription: string) => {
-    const newTask: Task = {
-      id: Math.random().toString(36).substr(2, 9),  // Generate a random ID for the task
-      task: taskDescription,
-      status: "incomplete",  // Default status
-      createdAt: new Date().toISOString(),
-      ipAddress: "127.0.0.1"  // Placeholder for IP address, you can replace it with a real value
-    };
-    setTasks([...tasks, newTask]);
+  const handleNewTask = (newTask : Task) => {
+    // Here we assume the newTask contains the full task object (including _id from the database)
+    setTasks((prevTasks) => [...prevTasks, newTask]);
   };
+  
 
   // Handle removing a task by its ID
-  const removeTaskFromList = (taskId: string) => {
-    setTasks(prevTasks => prevTasks.filter(task => task.id !== taskId));
+  const removeTaskFromList = (taskId) => {
+    // Remove the task with the given taskId from the state
+    setTasks(prevTasks => prevTasks.filter(task => task._id !== taskId));
   };
 
   // Effect to manage the countdown timer
@@ -107,7 +102,7 @@ export default function Home() {
 
       {/* Task form and task display */}
       <TaskForm onTaskSubmit={handleNewTask} />
-      <TaskApp tasks={tasks} onTaskUpdate={removeTaskFromList} />
+      <TaskApp tasks={tasks}  onTaskUpdate={removeTaskFromList} />
       <CompletedTasks />
 
       {/* ChatBox component */}
