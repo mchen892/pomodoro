@@ -1,134 +1,99 @@
 "use client";
 
-import { useState, useEffect } from 'react';
-import TaskForm from '../components/TaskForm';
-import CompletedTasks from '../components/CompletedTasks';
-import TaskApp from '../components/TaskApp';
+import { useState, useEffect } from "react";
+import TaskForm from "../components/TaskForm";
+import TaskApp from "../components/TaskApp";
+import ChatBox from "./components/chatbox";
 
-interface Task {
-  task: string;
-  status: string;
-  createdAt: string;
-}
 export default function Home() {
-  const [seconds, setSeconds] = useState(1500);  // Start at 25 minutes (1500 seconds)
-  const [isFiveMinuteTimer, setIsFiveMinuteTimer] = useState(false);  // Switch between 25-minute and 5-minute timers
-  const [isChatOpen, setIsChatOpen] = useState(false);  // State for collapsible chat box
-  const [currentTime, setCurrentTime] = useState(new Date());  // State for current time display
+  const [seconds, setSeconds] = useState(1500);
+  const [isFiveMinuteTimer, setIsFiveMinuteTimer] = useState(false);
+  const [currentTime, setCurrentTime] = useState(new Date());
+  const [tasks, setTasks] = useState([]);
+  const [isChatOpen, setIsChatOpen] = useState(false); // Define isChatOpen and setIsChatOpen here
 
-  // Task management
-  const [tasks, setTasks] = useState<string[]>([]);
-
-  // Add a task from chatbot
-  const addTask = (task: string) => {
-    setTasks((prevTasks) => [...prevTasks, task]);
-  };
-
-  // Post-Pomodoro reflection
-  const sessionFeedback = (feedback: string) => {
-    console.log('Session Feedback:', feedback);  // Log feedback for now, or use it for future logic
-  };
-
-
-  
- 
-  // Explicitly define tasks as an array of Task objects
-  const [tasks, setTasks] = useState<Task[]>([]);
-
-  // Handle adding a new task, typed explicitly
-  const handleNewTask = (newTask: Task) => {
+  // Handle adding a new task
+  const handleNewTask = (newTask: any) => {
     setTasks([...tasks, newTask]);
   };
 
-  // Effect to manage the countdown
+  // Timer countdown logic
   useEffect(() => {
     if (seconds > 0) {
       const interval = setInterval(() => {
         setSeconds((prevSeconds) => prevSeconds - 1);
       }, 1000);
-
-      return () => clearInterval(interval);  // Clean up interval on unmount
+      return () => clearInterval(interval);
     } else {
-      // Switch between the 25-minute and 5-minute timers when the timer reaches 0
-      if (isFiveMinuteTimer) {
-        setSeconds(1500);  // Reset to 25 minutes (1500 seconds)
-      } else {
-        setSeconds(300);  // Reset to 5 minutes (300 seconds)
-      }
-      setIsFiveMinuteTimer(!isFiveMinuteTimer);  // Toggle between 25 and 5-minute timers
+      // Switch between 25-minute and 5-minute timers
+      setSeconds(isFiveMinuteTimer ? 1500 : 300);
+      setIsFiveMinuteTimer(!isFiveMinuteTimer);
     }
   }, [seconds, isFiveMinuteTimer]);
 
-  // Effect to handle spacebar reset
+  // Handle spacebar reset
   useEffect(() => {
-    const handleKeyDown = (event: KeyboardEvent) => {
+    const handleKeyDown = (event: { code: string }) => {
       if (event.code === "Space") {
-        setSeconds(0);  // Reset timer when spacebar is pressed
+        setSeconds(0);
       }
     };
-
     window.addEventListener("keydown", handleKeyDown);
-
-    return () => {
-      window.removeEventListener("keydown", handleKeyDown);  // Cleanup on unmount
-    };
+    return () => window.removeEventListener("keydown", handleKeyDown);
   }, []);
 
-  // Effect to update the current time every second
+  // Update the current time every second
   useEffect(() => {
     const interval = setInterval(() => {
       setCurrentTime(new Date());
     }, 1000);
-
-    return () => clearInterval(interval);  // Clean up interval on unmount
+    return () => clearInterval(interval);
   }, []);
 
-  useEffect(() => {
-    console.log("Updated tasks:", tasks);
-  }, [tasks]);
-
-  // Function to format the time into minutes and seconds
+  // Format seconds into mm:ss
   const formatTime = (seconds: number) => {
     const minutes = Math.floor(seconds / 60);
     const remainingSeconds = seconds % 60;
-    return `${minutes}:${remainingSeconds < 10 ? '0' : ''}${remainingSeconds}`;
+    return `${minutes}:${remainingSeconds < 10 ? "0" : ""}${remainingSeconds}`;
   };
 
-  // Function to format the current time
+  // Format current time
   const formatCurrentTime = (date: Date) => {
     const hours = date.getHours();
     const minutes = date.getMinutes();
     const seconds = date.getSeconds();
-    const ampm = hours >= 12 ? 'pm' : 'am';
-    const formattedHours = hours % 12 || 12;  // Convert to 12-hour format
-    const formattedMinutes = minutes < 10 ? `0${minutes}` : minutes;
-    const formattedSeconds = seconds < 10 ? `0${seconds}` : seconds;
-    return `${formattedHours}:${formattedMinutes}:${formattedSeconds} ${ampm}`;
+    const ampm = hours >= 12 ? "pm" : "am";
+    const formattedHours = hours % 12 || 12;
+    return `${formattedHours}:${minutes < 10 ? `0${minutes}` : minutes}:${
+      seconds < 10 ? `0${seconds}` : seconds
+    } ${ampm}`;
   };
 
-
-
+  // Correctly structured return statement
   return (
     <div className="flex flex-col items-center justify-center min-h-screen bg-light text-darkBlueGray">
       {/* Pomodoro Timer */}
       <div className="p-8 bg-softPurple rounded-lg shadow-md text-center">
         <h1 className="text-4xl font-bold mb-4">Pomodoro Timer</h1>
-        <h2 className="text-6xl font-semibold">
-          {formatTime(seconds)}
-        </h2>
+        <h2 className="text-6xl font-semibold">{formatTime(seconds)}</h2>
       </div>
 
-      {/* Display current time below the countdown */}
-      <p className="text-3xl mt-8">
-        {formatCurrentTime(currentTime)}
-      </p>
+      {/* Display current time */}
+      <p className="text-3xl mt-8">{formatCurrentTime(currentTime)}</p>
+
+      {/* Task form and task display */}
       <TaskForm onTaskSubmit={handleNewTask} />
       <TaskApp tasks={tasks} />
-     
-      
-      
-      {/*<TaskApp tasks={tasks} />
-      <CompletedTasks/>*/}
+
+      {/* ChatBox component */}
+      <ChatBox
+        isChatOpen={isChatOpen} // Now correctly passing the state
+        setIsChatOpen={setIsChatOpen} // Passing the function to toggle the chat
+        addTask={handleNewTask} // Passing the task handler function
+        sessionFeedback={(feedback) => console.log("Feedback:", feedback)} // Placeholder for session feedback
+      />
+
+      {/* Style for blink animation */}
       <style jsx>{`
         .blink {
           animation: blink-animation 1s steps(2, start) infinite;

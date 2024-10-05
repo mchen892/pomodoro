@@ -1,24 +1,32 @@
 "use client";
 
 import { useState, useEffect } from 'react';
-import io from 'socket.io-client';
+import io, { Socket } from 'socket.io-client';
 
-// Initialize socket connection to the production URL
-const socket = io('https://pomopals-seven.vercel.app'); // Use your real-time chat server URL
+let socket: Socket; // Declare the socket variable outside the component
 
 const RealTimeChat = () => {
   const [messages, setMessages] = useState<string[]>([]);
   const [input, setInput] = useState<string>('');
 
-  // Socket.io: Listen for incoming messages
+  // Initialize the Socket.io connection only once
   useEffect(() => {
+    socket = io('https://pomopals-seven.vercel.app', {
+      transports: ['websocket'], // Ensure the websocket transport is used
+      reconnection: true,         // Enable reconnection
+      withCredentials: true,      // Allow cross-origin requests if needed
+    });
+
+    // Socket.io: Listen for incoming messages
     socket.on('message', (message: string) => {
       setMessages((prevMessages) => [...prevMessages, message]);
     });
 
-    // Cleanup when component unmounts
+    // Cleanup the socket connection when the component unmounts
     return () => {
-      socket.disconnect();
+      if (socket) {
+        socket.disconnect();
+      }
     };
   }, []);
 
@@ -26,9 +34,10 @@ const RealTimeChat = () => {
   const sendMessage = (e: React.FormEvent) => {
     e.preventDefault();
     if (input) {
+      // Emit the message to the server
       socket.emit('message', input);
       setMessages((prevMessages) => [...prevMessages, `You: ${input}`]);
-      setInput('');
+      setInput(''); // Clear the input field
     }
   };
 

@@ -100,6 +100,7 @@ const ChatBox: React.FC<ChatBoxProps> = ({ isChatOpen, setIsChatOpen, addTask, s
             >
               Real-Time Chat
             </button>
+            
           </div>
 
           {/* Conditionally Render Based on Active Tab */}
