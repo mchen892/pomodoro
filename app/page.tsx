@@ -4,6 +4,7 @@ import { useState, useEffect, useRef } from "react";
 import TaskForm from "../components/TaskForm";
 import TaskApp from "../components/TaskApp";
 import ChatBox from "./components/chatbox";
+import CompletedTasks from "../components/CompletedTasks"
 
 export default function Home() {
   const [seconds, setSeconds] = useState(1500);
@@ -19,7 +20,7 @@ export default function Home() {
     setTasks([...tasks, newTask]);
   };
 
-  const removeTaskFromList = (taskId) => {
+  const removeTaskFromList = (taskId: any) => {
     // Remove the task with the given taskId from the state
     setTasks(prevTasks => prevTasks.filter(task => task._id !== taskId));
   };
@@ -112,10 +113,6 @@ export default function Home() {
       />
 
       {/* Style for blink animation */}
-      {/* Display current time below the countdown */}
-      <p className="text-3xl mt-8">
-        {formatCurrentTime(currentTime)}
-      </p>
 
       {/* Audio element for the sound */}
       <audio ref={audioRef}>
