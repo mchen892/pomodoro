@@ -9,7 +9,7 @@ import CompletedTasks from "../components/CompletedTasks"
 export default function Home() {
   const [seconds, setSeconds] = useState(1500);
   const [isFiveMinuteTimer, setIsFiveMinuteTimer] = useState(false);
-  const [currentTime, setCurrentTime] = useState(new Date());
+  const [currentTime, setCurrentTime] = useState<string>("");
 
   const audioRef = useRef<HTMLAudioElement>(null);
   const [tasks, setTasks] = useState([]);
@@ -56,12 +56,23 @@ export default function Home() {
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, []);
 
-  // Update the current time every second
+  // Update the current time on the client only
   useEffect(() => {
-    const interval = setInterval(() => {
-      setCurrentTime(new Date());
-    }, 1000);
-    return () => clearInterval(interval);
+    const updateCurrentTime = () => {
+      const date = new Date();
+      const hours = date.getHours();
+      const minutes = date.getMinutes();
+      const seconds = date.getSeconds();
+      const ampm = hours >= 12 ? "pm" : "am";
+      const formattedHours = hours % 12 || 12;
+      const formattedMinutes = minutes < 10 ? `0${minutes}` : minutes;
+      const formattedSeconds = seconds < 10 ? `0${seconds}` : seconds;
+      setCurrentTime(`${formattedHours}:${formattedMinutes}:${formattedSeconds} ${ampm}`);
+    };
+
+    updateCurrentTime(); // Set initial time
+    const interval = setInterval(updateCurrentTime, 1000); // Update every second
+    return () => clearInterval(interval); // Clean up on unmount
   }, []);
 
   // Format seconds into mm:ss
@@ -71,17 +82,6 @@ export default function Home() {
     return `${minutes}:${remainingSeconds < 10 ? "0" : ""}${remainingSeconds}`;
   };
 
-  // Format current time
-  const formatCurrentTime = (date: Date) => {
-    const hours = date.getHours();
-    const minutes = date.getMinutes();
-    const seconds = date.getSeconds();
-    const ampm = hours >= 12 ? "pm" : "am";
-    const formattedHours = hours % 12 || 12;
-    return `${formattedHours}:${minutes < 10 ? `0${minutes}` : minutes}:${
-      seconds < 10 ? `0${seconds}` : seconds
-    } ${ampm}`;
-  };
 
   // Correctly structured return statement
   return (
@@ -93,7 +93,7 @@ export default function Home() {
       </div>
 
       {/* Display current time */}
-      <p className="text-3xl mt-8">{formatCurrentTime(currentTime)}</p>
+      <p className="text-3xl mt-8">{currentTime}</p>
 
       {/* Task form and task display */}
       <TaskForm onTaskSubmit={handleNewTask} />
