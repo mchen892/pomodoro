@@ -16,10 +16,13 @@ export async function POST(req) {
       return NextResponse.json({ message: 'Task and status are required' }, { status: 400 });
     }
 
+    const ip = req.headers.get('x-forwarded-for') || req.headers.get('remote-addr') || 'Unknown';
+
     const newTask = {
       task,
       status,
       createdAt: new Date(),
+      ipAddress: ip,
     };
     
     const result = await db.collection('tasks').insertOne(newTask);

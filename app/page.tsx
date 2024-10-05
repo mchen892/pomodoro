@@ -6,6 +6,12 @@ import TaskApp from "../components/TaskApp";
 import ChatBox from "./components/chatbox";
 import CompletedTasks from "../components/CompletedTasks"
 
+interface Task {
+  task: string;
+  status: string;
+  createdAt: string;
+  ipAddress: string;}
+
 export default function Home() {
   const [seconds, setSeconds] = useState(1500);
   const [isFiveMinuteTimer, setIsFiveMinuteTimer] = useState(false);
