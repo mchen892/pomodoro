@@ -6,9 +6,8 @@ import TaskApp from "../components/TaskApp";
 import ChatBox from "./components/chatbox";
 import CompletedTasks from "../components/CompletedTasks";
 
-// Define the structure of a Task object
 interface Task {
-  id: string; // Unique ID for each task
+  id: string;
   task: string;
   status: string;
   createdAt: string;
@@ -16,59 +15,53 @@ interface Task {
 }
 
 export default function Home() {
-  const [seconds, setSeconds] = useState(1500);  // Timer starts at 25 minutes (1500 seconds)
-  const [isFiveMinuteTimer, setIsFiveMinuteTimer] = useState(false);  // Toggle between 25-minute and 5-minute timers
-  const [currentTime, setCurrentTime] = useState<string>("");  // State for displaying the current time
-  const audioRef = useRef<HTMLAudioElement>(null);  // Reference for the audio element
-  const [tasks, setTasks] = useState<Task[]>([]);  // State for the task list
-  const [isChatOpen, setIsChatOpen] = useState(false);  // State for chatbox open/close
+  const [seconds, setSeconds] = useState(1500);
+  const [isFiveMinuteTimer, setIsFiveMinuteTimer] = useState(false);
+  const [currentTime, setCurrentTime] = useState<string>("");
+  const audioRef = useRef<HTMLAudioElement>(null);
+  const [tasks, setTasks] = useState<Task[]>([]);
+  const [isChatOpen, setIsChatOpen] = useState(false);
 
-  // Handle adding a new task by creating a Task object from the task description
   const handleNewTask = (taskDescription: string) => {
     const newTask: Task = {
-      id: Math.random().toString(36).substr(2, 9),  // Generate a random ID for the task
+      id: Math.random().toString(36).substr(2, 9),
       task: taskDescription,
-      status: "incomplete",  // Default status
+      status: "incomplete",
       createdAt: new Date().toISOString(),
-      ipAddress: "127.0.0.1"  // Placeholder for IP address, you can replace it with a real value
+      ipAddress: "127.0.0.1",
     };
     setTasks([...tasks, newTask]);
   };
 
-  // Handle removing a task by its ID
   const removeTaskFromList = (taskId: string) => {
-    setTasks(prevTasks => prevTasks.filter(task => task.id !== taskId));
+    setTasks((prevTasks) => prevTasks.filter((task) => task.id !== taskId));
   };
 
-  // Effect to manage the countdown timer
   useEffect(() => {
     if (seconds > 0) {
       const interval = setInterval(() => {
-        setSeconds(prevSeconds => prevSeconds - 1);
+        setSeconds((prevSeconds) => prevSeconds - 1);
       }, 1000);
-      return () => clearInterval(interval);  // Clean up the interval on unmount
+      return () => clearInterval(interval);
     } else {
       if (audioRef.current) {
-        audioRef.current.play();  // Play chime sound when the timer finishes
+        audioRef.current.play();
       }
-      // Toggle between 25-minute and 5-minute timers when the countdown reaches zero
       setSeconds(isFiveMinuteTimer ? 1500 : 300);
       setIsFiveMinuteTimer(!isFiveMinuteTimer);
     }
   }, [seconds, isFiveMinuteTimer]);
 
-  // Handle spacebar reset for the timer
   useEffect(() => {
     const handleKeyDown = (event: { code: string }) => {
       if (event.code === "Space") {
-        setSeconds(0);  // Reset the timer when spacebar is pressed
+        setSeconds(0);
       }
     };
     window.addEventListener("keydown", handleKeyDown);
-    return () => window.removeEventListener("keydown", handleKeyDown);  // Cleanup on unmount
+    return () => window.removeEventListener("keydown", handleKeyDown);
   }, []);
 
-  // Update the current time every second
   useEffect(() => {
     const updateCurrentTime = () => {
       const date = new Date();
@@ -76,18 +69,19 @@ export default function Home() {
       const minutes = date.getMinutes();
       const seconds = date.getSeconds();
       const ampm = hours >= 12 ? "pm" : "am";
-      const formattedHours = hours % 12 || 12;  // Convert to 12-hour format
+      const formattedHours = hours % 12 || 12;
       const formattedMinutes = minutes < 10 ? `0${minutes}` : minutes;
       const formattedSeconds = seconds < 10 ? `0${seconds}` : seconds;
-      setCurrentTime(`${formattedHours}:${formattedMinutes}:${formattedSeconds} ${ampm}`);
+      setCurrentTime(
+        `${formattedHours}:${formattedMinutes}:${formattedSeconds} ${ampm}`
+      );
     };
 
-    updateCurrentTime();  // Set the initial time when component mounts
-    const interval = setInterval(updateCurrentTime, 1000);  // Update the time every second
-    return () => clearInterval(interval);  // Clean up on unmount
+    updateCurrentTime();
+    const interval = setInterval(updateCurrentTime, 1000);
+    return () => clearInterval(interval);
   }, []);
 
-  // Format seconds into mm:ss format
   const formatTime = (seconds: number) => {
     const minutes = Math.floor(seconds / 60);
     const remainingSeconds = seconds % 60;
@@ -97,7 +91,7 @@ export default function Home() {
   return (
     <div className="flex flex-col items-center justify-center min-h-screen bg-light text-darkBlueGray">
       {/* Pomodoro Timer */}
-      <div className="p-8 bg-softPurple rounded-lg shadow-md text-center">
+      <div className="flex flex-col items-center justify-center p-8 bg-softPurple rounded-lg shadow-md text-center">
         <h1 className="text-4xl font-bold mb-4">Pomodoro Timer</h1>
         <h2 className="text-6xl font-semibold">{formatTime(seconds)}</h2>
       </div>
@@ -112,11 +106,23 @@ export default function Home() {
 
       {/* ChatBox component */}
       <ChatBox
-        isChatOpen={isChatOpen}  // Pass the state for chatbox visibility
-        setIsChatOpen={setIsChatOpen}  // Function to toggle the chatbox visibility
-        addTask={handleNewTask}  // Pass the task handler function to the chatbox
-        sessionFeedback={(feedback) => console.log("Feedback:", feedback)}  // Log session feedback
+        isChatOpen={isChatOpen}
+        setIsChatOpen={setIsChatOpen}
+        addTask={handleNewTask}
+        sessionFeedback={(feedback) => console.log("Feedback:", feedback)}
       />
+
+      {/* Spotify iframe */}
+      <iframe
+        className="spotify-embed"
+        src="https://open.spotify.com/embed/playlist/3QPsci3WscAUEkfPHb5Cw6?utm_source=generator&theme=0"
+        width="300"
+        height="80"
+        frameBorder="0"
+        allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
+        allowFullScreen // Fix the casing here
+        loading="lazy"
+      ></iframe>
 
       {/* Audio element for the sound */}
       <audio ref={audioRef}>
@@ -125,6 +131,14 @@ export default function Home() {
       </audio>
 
       <style jsx>{`
+        .spotify-embed {
+          position: absolute;
+          bottom: 20px;
+          left: 20px;
+          border-radius: 12px;
+          z-index: 1000; /* Ensure it's on top of other elements */
+        }
+
         .blink {
           animation: blink-animation 1s steps(2, start) infinite;
         }
