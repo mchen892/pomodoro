@@ -7,6 +7,7 @@ import ChatBox from "./components/chatbox";
 import CompletedTasks from "../components/CompletedTasks";
 
 interface Task {
+  _id: any;
   id: string;
   task: string;
   status: string;
@@ -29,7 +30,7 @@ export default function Home() {
   
 
   // Handle removing a task by its ID
-  const removeTaskFromList = (taskId) => {
+  const removeTaskFromList = (taskId : string) => {
     // Remove the task with the given taskId from the state
     setTasks(prevTasks => prevTasks.filter(task => task._id !== taskId));
   };
