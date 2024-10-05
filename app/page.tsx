@@ -31,6 +31,11 @@ export default function Home() {
     setTasks([...tasks, newTask]);
   };
 
+ 
+
+  
+
+
   // Effect to manage the countdown
   useEffect(() => {
     if (seconds > 0) {

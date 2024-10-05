@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { connectToDatabase } from '@/lib/mongodb';
 
+
 // Handle POST requests (creating a task)
 export async function POST(req) {
   try {
@@ -8,7 +9,7 @@ export async function POST(req) {
     const { task, status } = await req.json(); // Parse the incoming request body
 
     // Log the request body for debugging
-    console.log('Task:', task, 'Status:', status);
+ 
 
     // Validate the request body
     if (!task || !status) {
@@ -44,8 +45,13 @@ export async function GET() {
       .sort({ createdAt: -1 })
       .toArray();
 
+    const formattedTasks = tasks.map(task => ({
+        ...task,
+        id: task._id.toString(), // Convert ObjectId to string and rename _id to id
+      }));
+
     // Respond with the list of completed tasks
-    return NextResponse.json(tasks);
+    return NextResponse.json(formattedTasks);
   } catch (error) {
     console.error('Error fetching tasks:', error);
     return NextResponse.json({ message: 'Failed to fetch tasks' }, { status: 500 });
