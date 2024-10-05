@@ -1,6 +1,6 @@
 "use client";  // This tells Next.js to render this component on the client
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 
 export default function Home() {
   // Timer states
@@ -11,6 +11,8 @@ export default function Home() {
   // State for current time display
   const [currentTime, setCurrentTime] = useState(new Date());
 
+  const audioRef = useRef<HTMLAudioElement>(null);
+
   // Effect to manage the countdown
   useEffect(() => {
     if (seconds > 0) {
@@ -20,6 +22,9 @@ export default function Home() {
 
       return () => clearInterval(interval);  // Clean up interval on unmount
     } else {
+      if (audioRef.current) {
+        audioRef.current.play();
+      }
       // Switch between the 25-minute and 5-minute timers when the timer reaches 0
       if (isFiveMinuteTimer) {
         setSeconds(1500);  // Reset to 25 minutes (1500 seconds)
@@ -93,6 +98,12 @@ export default function Home() {
       <p className="text-3xl mt-8">
         {formatCurrentTime(currentTime)}
       </p>
+
+      {/* Audio element for the sound */}
+      <audio ref={audioRef}>
+        <source src="/sounds/chime.mp3" type="audio/mp3" />
+        Your browser does not support the audio element.
+      </audio>
 
       <style jsx>{`
         .blink {
