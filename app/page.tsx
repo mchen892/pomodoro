@@ -1,99 +1,104 @@
-"use client";  // This tells Next.js to render this component on the client
+"use client";
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef } from "react";
+import TaskForm from "../components/TaskForm";
+import TaskApp from "../components/TaskApp";
+import ChatBox from "./components/chatbox";
 
 export default function Home() {
-  // Timer states
-  const [seconds, setSeconds] = useState(1500);  // Start at 25 minutes (1500 seconds)
-  const [isFiveMinuteTimer, setIsFiveMinuteTimer] = useState(false);  // Switch between 25-minute and 5-minute timers
-  const [manualReset, setManualReset] = useState(false);  // Track manual resets via spacebar
-
-  // State for current time display
+  const [seconds, setSeconds] = useState(1500);
+  const [isFiveMinuteTimer, setIsFiveMinuteTimer] = useState(false);
   const [currentTime, setCurrentTime] = useState(new Date());
 
   const audioRef = useRef<HTMLAudioElement>(null);
+  const [tasks, setTasks] = useState([]);
+  const [isChatOpen, setIsChatOpen] = useState(false); // Define isChatOpen and setIsChatOpen here
 
-  // Effect to manage the countdown
+  // Handle adding a new task
+  const handleNewTask = (newTask: any) => {
+    setTasks([...tasks, newTask]);
+  };
+
+  // Timer countdown logic
   useEffect(() => {
     if (seconds > 0) {
       const interval = setInterval(() => {
-        setSeconds(prevSeconds => prevSeconds - 1);
+        setSeconds((prevSeconds) => prevSeconds - 1);
       }, 1000);
-
-      return () => clearInterval(interval);  // Clean up interval on unmount
+      return () => clearInterval(interval);
     } else {
       if (audioRef.current) {
         audioRef.current.play();
       }
-      // Switch between the 25-minute and 5-minute timers when the timer reaches 0
-      if (isFiveMinuteTimer) {
-        setSeconds(1500);  // Reset to 25 minutes (1500 seconds)
-      } else {
-        setSeconds(300);  // Reset to 5 minutes (300 seconds)
-      }
-      setIsFiveMinuteTimer(!isFiveMinuteTimer);  // Toggle between 25 and 5-minute timers
+      // Switch between 25-minute and 5-minute timers
+      setSeconds(isFiveMinuteTimer ? 1500 : 300);
+      setIsFiveMinuteTimer(!isFiveMinuteTimer);
     }
   }, [seconds, isFiveMinuteTimer]);
 
+  // Handle spacebar reset
   useEffect(() => {
-    const handleKeyDown = (event: KeyboardEvent) => {
-      console.log(event.code);  // Log the key code for debugging
-  
+    const handleKeyDown = (event: { code: string }) => {
       if (event.code === "Space") {
         setSeconds(0);
       }
     };
-  
     window.addEventListener("keydown", handleKeyDown);
-  
-    return () => {
-      window.removeEventListener("keydown", handleKeyDown);
-    };
+    return () => window.removeEventListener("keydown", handleKeyDown);
   }, []);
-  
-  
-  // Reset the manualReset flag when the timer reaches 10 seconds
-  useEffect(() => {
-    if (seconds !== 10) {
-      setManualReset(false);
-    }
-  }, [seconds]);
 
-  // Effect to update the current time every second
+  // Update the current time every second
   useEffect(() => {
     const interval = setInterval(() => {
       setCurrentTime(new Date());
     }, 1000);
-
-    return () => clearInterval(interval);  // Clean up interval on unmount
+    return () => clearInterval(interval);
   }, []);
 
-  // Function to format the time into minutes and seconds
+  // Format seconds into mm:ss
   const formatTime = (seconds: number) => {
     const minutes = Math.floor(seconds / 60);
     const remainingSeconds = seconds % 60;
-    return `${minutes}:${remainingSeconds < 10 ? '0' : ''}${remainingSeconds}`;
+    return `${minutes}:${remainingSeconds < 10 ? "0" : ""}${remainingSeconds}`;
   };
 
-  // Function to format the current time
+  // Format current time
   const formatCurrentTime = (date: Date) => {
     const hours = date.getHours();
     const minutes = date.getMinutes();
     const seconds = date.getSeconds();
-    const ampm = hours >= 12 ? 'pm' : 'am';
-    const formattedHours = hours % 12 || 12;  // Convert to 12-hour format
-    const formattedMinutes = minutes < 10 ? `0${minutes}` : minutes;
-    const formattedSeconds = seconds < 10 ? `0${seconds}` : seconds;
-    return `${formattedHours}:${formattedMinutes}:${formattedSeconds} ${ampm}`;
+    const ampm = hours >= 12 ? "pm" : "am";
+    const formattedHours = hours % 12 || 12;
+    return `${formattedHours}:${minutes < 10 ? `0${minutes}` : minutes}:${
+      seconds < 10 ? `0${seconds}` : seconds
+    } ${ampm}`;
   };
 
+  // Correctly structured return statement
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen bg-black text-white">
-      {/* Countdown Timer */}
-      <h1 className="text-6xl font-bold">
-        {formatTime(seconds)}
-      </h1>
+    <div className="flex flex-col items-center justify-center min-h-screen bg-light text-darkBlueGray">
+      {/* Pomodoro Timer */}
+      <div className="p-8 bg-softPurple rounded-lg shadow-md text-center">
+        <h1 className="text-4xl font-bold mb-4">Pomodoro Timer</h1>
+        <h2 className="text-6xl font-semibold">{formatTime(seconds)}</h2>
+      </div>
 
+      {/* Display current time */}
+      <p className="text-3xl mt-8">{formatCurrentTime(currentTime)}</p>
+
+      {/* Task form and task display */}
+      <TaskForm onTaskSubmit={handleNewTask} />
+      <TaskApp tasks={tasks} />
+
+      {/* ChatBox component */}
+      <ChatBox
+        isChatOpen={isChatOpen} // Now correctly passing the state
+        setIsChatOpen={setIsChatOpen} // Passing the function to toggle the chat
+        addTask={handleNewTask} // Passing the task handler function
+        sessionFeedback={(feedback) => console.log("Feedback:", feedback)} // Placeholder for session feedback
+      />
+
+      {/* Style for blink animation */}
       {/* Display current time below the countdown */}
       <p className="text-3xl mt-8">
         {formatCurrentTime(currentTime)}
