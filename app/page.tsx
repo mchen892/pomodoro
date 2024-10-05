@@ -1,6 +1,15 @@
 "use client";  // This tells Next.js to render this component on the client
 
 import { useState, useEffect } from 'react';
+import TaskForm from '../components/TaskForm';
+import CompletedTasks from '../components/CompletedTasks';
+import TaskApp from '../components/TaskApp';
+
+interface Task {
+  task: string;
+  status: string;
+  createdAt: string;
+}
 
 export default function Home() {
   // Timer states
@@ -10,6 +19,17 @@ export default function Home() {
 
   // State for current time display
   const [currentTime, setCurrentTime] = useState(new Date());
+
+
+  
+ 
+  // Explicitly define tasks as an array of Task objects
+  const [tasks, setTasks] = useState<Task[]>([]);
+
+  // Handle adding a new task, typed explicitly
+  const handleNewTask = (newTask: Task) => {
+    setTasks([...tasks, newTask]);
+  };
 
   // Effect to manage the countdown
   useEffect(() => {
@@ -63,6 +83,10 @@ export default function Home() {
     return () => clearInterval(interval);  // Clean up interval on unmount
   }, []);
 
+  useEffect(() => {
+    console.log("Updated tasks:", tasks);
+  }, [tasks]);
+
   // Function to format the time into minutes and seconds
   const formatTime = (seconds: number) => {
     const minutes = Math.floor(seconds / 60);
@@ -82,6 +106,8 @@ export default function Home() {
     return `${formattedHours}:${formattedMinutes}:${formattedSeconds} ${ampm}`;
   };
 
+
+
   return (
     <div className="flex flex-col items-center justify-center min-h-screen bg-black text-white">
       {/* Countdown Timer */}
@@ -93,6 +119,17 @@ export default function Home() {
       <p className="text-3xl mt-8">
         {formatCurrentTime(currentTime)}
       </p>
+
+      <TaskForm onTaskSubmit={handleNewTask} />
+      <TaskApp tasks={tasks} />
+     
+      
+      
+      {/*<TaskApp tasks={tasks} />
+      <CompletedTasks/>*/}
+
+
+      {/* Display a blinking text when the timer reaches 10 seconds */}
 
       <style jsx>{`
         .blink {
