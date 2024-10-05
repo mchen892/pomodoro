@@ -23,8 +23,15 @@ export default function Home() {
   const [tasks, setTasks] = useState<Task[]>([]);  // State for the task list
   const [isChatOpen, setIsChatOpen] = useState(false);  // State for chatbox open/close
 
-  // Handle adding a new task
-  const handleNewTask = (newTask: Task) => {
+  // Handle adding a new task by creating a Task object from the task description
+  const handleNewTask = (taskDescription: string) => {
+    const newTask: Task = {
+      id: Math.random().toString(36).substr(2, 9),  // Generate a random ID for the task
+      task: taskDescription,
+      status: "incomplete",  // Default status
+      createdAt: new Date().toISOString(),
+      ipAddress: "127.0.0.1"  // Placeholder for IP address, you can replace it with a real value
+    };
     setTasks([...tasks, newTask]);
   };
 
