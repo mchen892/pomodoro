@@ -64,14 +64,14 @@ export default function Home() {
   }, []);
 
   // Function to format the time into minutes and seconds
-  const formatTime = (seconds) => {
+  const formatTime = (seconds: number) => {
     const minutes = Math.floor(seconds / 60);
     const remainingSeconds = seconds % 60;
     return `${minutes}:${remainingSeconds < 10 ? '0' : ''}${remainingSeconds}`;
   };
 
   // Function to format the current time
-  const formatCurrentTime = (date) => {
+  const formatCurrentTime = (date: Date) => {
     const hours = date.getHours();
     const minutes = date.getMinutes();
     const seconds = date.getSeconds();
@@ -108,4 +108,3 @@ export default function Home() {
     </div>
   );
 }
-
