@@ -25,9 +25,6 @@ export default function Home() {
     setTasks(prevTasks => prevTasks.filter(task => task._id !== taskId));
   };
 
-  
-
-
   // Effect to manage the countdown
   useEffect(() => {
     if (seconds > 0) {

@@ -19,12 +19,29 @@ const RealTimeChat = () => {
 
     // Socket.io: Listen for incoming messages
     socket.on('message', (message: string) => {
+      console.log('Received message:', message); // Log received message
       setMessages((prevMessages) => [...prevMessages, message]);
+      localStorage.setItem('latestMessage', message); // Store incoming messages in local storage
     });
+
+    // Listen for changes in local storage
+    const handleStorageChange = (e: StorageEvent) => {
+      if (e.key === 'latestMessage') {
+          const newMessage = e.newValue;
+          if (newMessage) {
+              setMessages((prevMessages) => [...prevMessages, newMessage]);
+          }
+      }
+  };
+
+  window.addEventListener('storage', handleStorageChange);
+
 
     // Cleanup the socket connection when the component unmounts
     return () => {
       if (socket) {
+        socket.off('message');
+        window.removeEventListener('storage', handleStorageChange);
         socket.disconnect();
       }
     };
@@ -36,6 +53,7 @@ const RealTimeChat = () => {
     if (input) {
       // Emit the message to the server
       socket.emit('message', input);
+      localStorage.setItem('latestMessage', input); // Store in local storage
       setMessages((prevMessages) => [...prevMessages, `You: ${input}`]);
       setInput(''); // Clear the input field
     }
