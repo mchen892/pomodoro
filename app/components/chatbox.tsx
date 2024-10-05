@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useRef, useEffect } from 'react';
+import RealTimeChat from './chat'; // Import the real-time chat component
 
 interface ChatBoxProps {
   isChatOpen: boolean;
@@ -12,8 +13,11 @@ interface ChatBoxProps {
 const ChatBox: React.FC<ChatBoxProps> = ({ isChatOpen, setIsChatOpen, addTask, sessionFeedback }) => {
   const [prompt, setPrompt] = useState('');
   const [result, setResult] = useState('');
+  const [activeTab, setActiveTab] = useState<'ai' | 'chat'>('ai'); // State for tracking active tab
+
   const chatBoxRef = useRef<HTMLDivElement>(null);
 
+  // Handle AI prompt submission
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     processBotResponse(prompt);
@@ -24,8 +28,10 @@ const ChatBox: React.FC<ChatBoxProps> = ({ isChatOpen, setIsChatOpen, addTask, s
     });
     const data = await response.json();
     setResult(data.result);
+    setPrompt('');
   };
 
+  // Process AI-related input and manage tasks or suggestions
   const processBotResponse = (userInput: string) => {
     const lowerCaseInput = userInput.toLowerCase();
     if (lowerCaseInput.startsWith('add task:')) {
@@ -45,6 +51,7 @@ const ChatBox: React.FC<ChatBoxProps> = ({ isChatOpen, setIsChatOpen, addTask, s
     }
   };
 
+  // Close chat box when clicking outside
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (chatBoxRef.current && !chatBoxRef.current.contains(event.target as Node)) {
@@ -71,28 +78,57 @@ const ChatBox: React.FC<ChatBoxProps> = ({ isChatOpen, setIsChatOpen, addTask, s
         } w-96 bg-grayish shadow-lg`}
       >
         <div className="p-4">
-          <h2 className="text-xl font-bold text-darkBlueGray">AI Chat</h2>
+          <h2 className="text-xl font-bold text-darkBlueGray">Chat</h2>
           <button
             onClick={() => setIsChatOpen(false)}
             className="absolute top-2 right-2 text-darkBlueGray text-2xl"
           >
             ✖
           </button>
-          <form onSubmit={handleSubmit} className="mt-4">
-            <textarea
-              value={prompt}
-              onChange={(e) => setPrompt(e.target.value)}
-              className="w-full p-2 bg-light border border-darkBlueGray rounded"
-              placeholder="Ask me something..."
-            />
-            <button type="submit" className="mt-2 bg-darkBlueGray text-light p-2 rounded w-full">
-              Send
+
+          {/* Tab Navigation */}
+          <div className="mt-4 flex justify-around">
+            <button
+              onClick={() => setActiveTab('ai')}
+              className={`py-2 px-4 ${activeTab === 'ai' ? 'bg-darkBlueGray text-light' : 'bg-light text-darkBlueGray'} rounded`}
+            >
+              AI Chat
             </button>
-          </form>
-          <div className="mt-4">
-            <h3 className="text-darkBlueGray">Response:</h3>
-            <p>{result}</p>
+            <button
+              onClick={() => setActiveTab('chat')}
+              className={`py-2 px-4 ${activeTab === 'chat' ? 'bg-darkBlueGray text-light' : 'bg-light text-darkBlueGray'} rounded`}
+            >
+              Real-Time Chat
+            </button>
           </div>
+
+          {/* Conditionally Render Based on Active Tab */}
+          {activeTab === 'ai' ? (
+            <>
+              {/* AI Chat */}
+              <form onSubmit={handleSubmit} className="mt-4">
+                <textarea
+                  value={prompt}
+                  onChange={(e) => setPrompt(e.target.value)}
+                  className="w-full p-2 bg-light border border-darkBlueGray rounded"
+                  placeholder="Ask the AI something..."
+                />
+                <button type="submit" className="mt-2 bg-darkBlueGray text-light p-2 rounded w-full">
+                  Send to AI
+                </button>
+              </form>
+
+              <div className="mt-4">
+                <h3 className="text-darkBlueGray">AI Response:</h3>
+                <p>{result}</p>
+              </div>
+            </>
+          ) : (
+            <>
+              {/* Real-Time Chat (Socket.io) */}
+              <RealTimeChat /> {/* Use the real-time chat component */}
+            </>
+          )}
         </div>
       </div>
 

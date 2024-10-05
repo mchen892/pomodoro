@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import ChatBox from './components/chatbox';
+
 export default function Home() {
   const [seconds, setSeconds] = useState(1500);  // Start at 25 minutes (1500 seconds)
   const [isFiveMinuteTimer, setIsFiveMinuteTimer] = useState(false);  // Switch between 25-minute and 5-minute timers
@@ -123,6 +124,19 @@ export default function Home() {
           💬
         </button>
       )}
+
+      {/* Spotify Widget in Bottom Left Corner */}
+      <div className="fixed left-4 bottom-4">
+        <iframe
+          style={{ borderRadius: '12px' }}
+          src="https://open.spotify.com/embed/playlist/3QPsci3WscAUEkfPHb5Cw6?utm_source=generator&theme=0"
+          width="300"
+          height="152"
+          frameBorder="0"
+          allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
+          loading="lazy"
+        ></iframe>
+      </div>
     </div>
   );
 }
