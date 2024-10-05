@@ -103,12 +103,11 @@ export default function Home() {
       <CompletedTasks />
 
       {/* ChatBox component */}
-      {/* <ChatBox
+      <ChatBox
         isChatOpen={isChatOpen}
         setIsChatOpen={setIsChatOpen}
-        addTask={handleNewTask}
         sessionFeedback={(feedback) => console.log("Feedback:", feedback)}
-      /> */}
+      />
 
       {/* Spotify iframe */}
       <iframe
