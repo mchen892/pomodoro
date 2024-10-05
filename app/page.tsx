@@ -1,37 +1,31 @@
-"use client";  // This tells Next.js to render this component on the client
+"use client";
 
 import { useState, useEffect } from 'react';
-
+import ChatBox from './components/chatbox';
 export default function Home() {
-  // Timer states
   const [seconds, setSeconds] = useState(1500);  // Start at 25 minutes (1500 seconds)
   const [isFiveMinuteTimer, setIsFiveMinuteTimer] = useState(false);  // Switch between 25-minute and 5-minute timers
-  const [manualReset, setManualReset] = useState(false);  // Track manual resets via spacebar
+  const [isChatOpen, setIsChatOpen] = useState(false);  // State for collapsible chat box
+  const [currentTime, setCurrentTime] = useState(new Date());  // State for current time display
 
-  const [prompt, setPrompt] = useState('');
-  const [result, setResult] = useState('');
-  const handleSubmit = async (e: { preventDefault: () => void; }) => {
-    e.preventDefault();
+  // Task management
+  const [tasks, setTasks] = useState<string[]>([]);
 
-    const response = await fetch('/api/openai', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ prompt }),
-    });
-
-    const data = await response.json();
-    setResult(data.result);
+  // Add a task from chatbot
+  const addTask = (task: string) => {
+    setTasks((prevTasks) => [...prevTasks, task]);
   };
-  // State for current time display
-  const [currentTime, setCurrentTime] = useState(new Date());
+
+  // Post-Pomodoro reflection
+  const sessionFeedback = (feedback: string) => {
+    console.log('Session Feedback:', feedback);  // Log feedback for now, or use it for future logic
+  };
 
   // Effect to manage the countdown
   useEffect(() => {
     if (seconds > 0) {
       const interval = setInterval(() => {
-        setSeconds(prevSeconds => prevSeconds - 1);
+        setSeconds((prevSeconds) => prevSeconds - 1);
       }, 1000);
 
       return () => clearInterval(interval);  // Clean up interval on unmount
@@ -46,29 +40,20 @@ export default function Home() {
     }
   }, [seconds, isFiveMinuteTimer]);
 
+  // Effect to handle spacebar reset
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
-      console.log(event.code);  // Log the key code for debugging
-  
       if (event.code === "Space") {
-        setSeconds(0);
+        setSeconds(0);  // Reset timer when spacebar is pressed
       }
     };
-  
+
     window.addEventListener("keydown", handleKeyDown);
-  
+
     return () => {
-      window.removeEventListener("keydown", handleKeyDown);
+      window.removeEventListener("keydown", handleKeyDown);  // Cleanup on unmount
     };
   }, []);
-  
-  
-  // Reset the manualReset flag when the timer reaches 10 seconds
-  useEffect(() => {
-    if (seconds !== 10) {
-      setManualReset(false);
-    }
-  }, [seconds]);
 
   // Effect to update the current time every second
   useEffect(() => {
@@ -99,41 +84,45 @@ export default function Home() {
   };
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen bg-black text-white">
-      <div>
-      <h1>OpenAI GPT-3 Next.js Example</h1>
-      <form onSubmit={handleSubmit}>
-        <textarea
-          value={prompt}
-          onChange={(e) => setPrompt(e.target.value)}
-          placeholder="Enter a prompt"
-        />
-        <button type="submit">Generate Text</button>
-      </form>
-      <div>
-        <h2>Result:</h2>
-        <p>{result}</p>
+    <div className="flex flex-col items-center justify-center min-h-screen bg-light text-darkBlueGray">
+      {/* Pomodoro Timer */}
+      <div className="p-8 bg-softPurple rounded-lg shadow-md text-center">
+        <h1 className="text-4xl font-bold mb-4">Pomodoro Timer</h1>
+        <h2 className="text-6xl font-semibold">
+          {formatTime(seconds)}
+        </h2>
       </div>
-      {/* Countdown Timer */}
-      <h1 className="text-6xl font-bold">
-        {formatTime(seconds)}
-      </h1>
 
-      {/* Display current time below the countdown */}
-      <p className="text-3xl mt-8">
-        {formatCurrentTime(currentTime)}
-      </p>
+      {/* Display Current Time */}
+      <p className="text-2xl mt-6">{formatCurrentTime(currentTime)}</p>
 
-      <style jsx>{`
-        .blink {
-          animation: blink-animation 1s steps(2, start) infinite;
-        }
-
-        @keyframes blink-animation {
-          to {
-            visibility: hidden;
-          }
-        }
-      `}</style>
+      {/* Display Tasks */}
+      <div className="mt-8 bg-grayish p-4 rounded-lg w-80 shadow-sm">
+        <h2 className="text-2xl mb-2 font-semibold">Tasks</h2>
+        <ul className="list-disc ml-5">
+          {tasks.map((task, index) => (
+            <li key={index} className="text-lg">{task}</li>
+          ))}
+        </ul>
       </div>
-      </div>
+
+      {/* ChatBox Component */}
+      <ChatBox
+        isChatOpen={isChatOpen}
+        setIsChatOpen={setIsChatOpen}
+        addTask={addTask}
+        sessionFeedback={sessionFeedback}
+      />
+
+      {/* Toggle Chat Button */}
+      {!isChatOpen && (
+        <button
+          onClick={() => setIsChatOpen(true)}
+          className="fixed right-4 bottom-4 bg-darkBlueGray text-white p-4 rounded-full shadow-lg"
+        >
+          💬
+        </button>
+      )}
+    </div>
+  );
+}
