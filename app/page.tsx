@@ -148,7 +148,7 @@ export default function Home() {
         justify-content: space-between;
         width: 95%;
         height: 100vh; /* Full height of the screen */
-        padding: 20px;
+        padding: 20px 0;
         box-sizing: border-box; /* Ensures padding is inside the width */
         max-width: 1800px; /* Limit the width of the container */
       }
@@ -156,7 +156,7 @@ export default function Home() {
       .leftcontainer {
         flex: 1; /* Take up 1 part of the available space */
         padding-right: 20px;
-        margin-left: 0;
+        margin-left: 0px;
         margin-right: auto;
         overflow-y: auto;
         width: 90%;
