@@ -20,7 +20,7 @@ export default function Home() {
     setTasks([...tasks, newTask]);
   };
 
-  const removeTaskFromList = (taskId: any) => {
+  const removeTaskFromList = (taskId: string) => {
     // Remove the task with the given taskId from the state
     setTasks(prevTasks => prevTasks.filter(task => task._id !== taskId));
   };
