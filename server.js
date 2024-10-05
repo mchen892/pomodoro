@@ -15,6 +15,13 @@ app.use('/chat', express.static('chat_app'));
 // Socket.io connection handling
 io.on('connection', (socket) => {
     console.log('a user connected');
+
+    // Listen for chat messages
+    socket.on('chat message', (msg) => {
+        // Emit the message to all connected clients
+        io.emit('chat message', msg);
+    });
+
     socket.on('disconnect', () => {
         console.log('user disconnected');
     });
