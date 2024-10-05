@@ -96,7 +96,6 @@ export default function Home() {
           <div className ="clockdiv">
               {/* Pomodoro Timer */}
             <div className="flex flex-col items-center justify-center p-8 bg-softPurple rounded-lg shadow-md text-center">
-              <h1 className="text-4xl font-bold mb-4">Pomodoro Timer</h1>
               <h2 className="text-6xl font-semibold justify-center ">{formatTime(seconds)}</h2>
             </div>
             {/* Display current time */}
