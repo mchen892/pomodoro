@@ -6,48 +6,46 @@ import RealTimeChat from './chat'; // Import the real-time chat component
 interface ChatBoxProps {
   isChatOpen: boolean;
   setIsChatOpen: (value: boolean) => void;
-  addTask: (task: string) => void;
   sessionFeedback: (feedback: string) => void;
 }
 
-const ChatBox: React.FC<ChatBoxProps> = ({ isChatOpen, setIsChatOpen, addTask, sessionFeedback }) => {
-  const [prompt, setPrompt] = useState('');
-  const [result, setResult] = useState('');
-  const [activeTab, setActiveTab] = useState<'ai' | 'chat'>('ai'); // State for tracking active tab
+const ChatBox: React.FC<ChatBoxProps> = ({ isChatOpen, setIsChatOpen, sessionFeedback }) => {
+  const [prompt, setPrompt] = useState(''); // User's question
+  const [result, setResult] = useState(''); // AI's answer
+  const [activeTab, setActiveTab] = useState<'ai' | 'chat'>('ai'); // Track active tab (AI Chat or Real-Time Chat)
+  const [loading, setLoading] = useState(false); // Loading state for AI request
+  const [error, setError] = useState(''); // Error state
 
   const chatBoxRef = useRef<HTMLDivElement>(null);
 
   // Handle AI prompt submission
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    processBotResponse(prompt);
-    const response = await fetch('/api/openai', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ prompt }),
-    });
-    const data = await response.json();
-    setResult(data.result);
-    setPrompt('');
-  };
+    e.preventDefault(); // Prevent form from refreshing
 
-  // Process AI-related input and manage tasks or suggestions
-  const processBotResponse = (userInput: string) => {
-    const lowerCaseInput = userInput.toLowerCase();
-    if (lowerCaseInput.startsWith('add task:')) {
-      const newTask = userInput.substring(9).trim();
-      addTask(newTask);
-      setResult(`Task added: "${newTask}"`);
-    } else if (lowerCaseInput.includes('tired')) {
-      setResult('Take a break! How about stretching or a short walk?');
-    } else if (lowerCaseInput.includes('focus')) {
-      setResult('To improve focus, try a quick meditation or deep breathing.');
-    } else if (lowerCaseInput.startsWith('session feedback:')) {
-      const feedback = userInput.substring(17).trim();
-      sessionFeedback(feedback);
-      setResult(`Thank you for your feedback: "${feedback}".`);
-    } else {
-      setResult('Sorry, I didn’t understand that.');
+    if (!prompt.trim()) return; // If no prompt is entered, do nothing
+
+    setLoading(true); // Start loading
+    setError(''); // Reset any previous errors
+
+    try {
+      const response = await fetch('/api/openai', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ prompt }), // Send the user's prompt to the API
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to get a response from AI'); // Handle errors if the response is not OK
+      }
+
+      const data = await response.json(); // Parse the response from the backend
+      setResult(data.result || 'No response from AI'); // Set the AI's response in the state
+    } catch (error) {
+      console.error('Error:', error);
+      setError('An error occurred. Please try again later.'); // Show error message
+    } finally {
+      setLoading(false); // End loading
+      setPrompt(''); // Clear the input after submission
     }
   };
 
@@ -58,11 +56,13 @@ const ChatBox: React.FC<ChatBoxProps> = ({ isChatOpen, setIsChatOpen, addTask, s
         setIsChatOpen(false);
       }
     };
+
     if (isChatOpen) {
       document.addEventListener('mousedown', handleClickOutside);
     } else {
       document.removeEventListener('mousedown', handleClickOutside);
     }
+
     return () => {
       document.removeEventListener('mousedown', handleClickOutside);
     };
@@ -75,7 +75,7 @@ const ChatBox: React.FC<ChatBoxProps> = ({ isChatOpen, setIsChatOpen, addTask, s
         ref={chatBoxRef}
         className={`fixed right-0 top-0 h-full transition-transform duration-300 ${
           isChatOpen ? 'translate-x-0' : 'translate-x-full'
-        } w-96 bg-grayish shadow-lg`}
+        } w-96 bg-gray-100 shadow-lg`}
       >
         <div className="p-4">
           <h2 className="text-xl font-bold text-darkBlueGray">Chat</h2>
@@ -109,18 +109,21 @@ const ChatBox: React.FC<ChatBoxProps> = ({ isChatOpen, setIsChatOpen, addTask, s
               <form onSubmit={handleSubmit} className="mt-4">
                 <textarea
                   value={prompt}
-                  onChange={(e) => setPrompt(e.target.value)}
+                  onChange={(e) => setPrompt(e.target.value)} // Update prompt state on change
                   className="w-full p-2 bg-light border border-darkBlueGray rounded"
                   placeholder="Ask the AI something..."
+                  disabled={loading} // Disable input during loading
                 />
-                <button type="submit" className="mt-2 bg-darkBlueGray text-light p-2 rounded w-full">
-                  Send to AI
+                <button type="submit" className="mt-2 bg-darkBlueGray text-light p-2 rounded w-full" disabled={loading}>
+                  {loading ? 'Sending...' : 'Send to AI'}
                 </button>
               </form>
 
+              {error && <p className="text-red-500 mt-4">{error}</p>} {/* Show error message */}
+
               <div className="mt-4">
                 <h3 className="text-darkBlueGray">AI Response:</h3>
-                <p>{result}</p>
+                <p>{result || "No response yet"}</p> {/* Show AI's response */}
               </div>
             </>
           ) : (

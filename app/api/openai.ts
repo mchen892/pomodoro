@@ -1,12 +1,12 @@
 // pages/api/openai.ts
-import { NextApiRequest, NextApiResponse } from 'next';
-import { Configuration, OpenAI } from 'openai';
 
-const configuration = new Configuration({
-  apiKey: process.env.OPENAI_API_KEY,
+import type { NextApiRequest, NextApiResponse } from 'next';
+import OpenAI from 'openai';
+
+// Initialize OpenAI with the API key from environment variables
+const openai = new OpenAI({
+  apiKey: process.env.OPENAI_API_KEY, // Make sure your API key is correctly set
 });
-
-const openai = new OpenAI(configuration);
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== 'POST') {
@@ -20,15 +20,18 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   }
 
   try {
-    const response = await openai.createCompletion({
-      model: 'text-davinci-003',
-      prompt,
-      max_tokens: 100,
+    // Use the new OpenAI SDK for chat completion with GPT-4
+    const completion = await openai.chat.completions.create({
+      model: 'gpt-4', // Specify the model
+      messages: [
+        { role: 'system', content: 'You are a helpful assistant.' },
+        { role: 'user', content: prompt }, // Send the prompt from the user
+      ],
     });
 
-    const aiResult = response.data.choices[0]?.text || 'No response from AI';
+    const aiResponse = completion.choices[0].message;
 
-    return res.status(200).json({ result: aiResult });
+    return res.status(200).json({ result: aiResponse }); // Send the AI response back to the client
   } catch (error) {
     console.error('Error with OpenAI API:', error);
     return res.status(500).json({ message: 'Failed to fetch AI response' });
