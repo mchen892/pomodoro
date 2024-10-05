@@ -17,7 +17,15 @@ export default function Home() {
     setTasks([...tasks, newTask]);
   };
 
-  // Timer countdown logic
+  const removeTaskFromList = (taskId) => {
+    // Remove the task with the given taskId from the state
+    setTasks(prevTasks => prevTasks.filter(task => task._id !== taskId));
+  };
+
+  
+
+
+  // Effect to manage the countdown
   useEffect(() => {
     if (seconds > 0) {
       const interval = setInterval(() => {
@@ -83,7 +91,12 @@ export default function Home() {
 
       {/* Task form and task display */}
       <TaskForm onTaskSubmit={handleNewTask} />
-      <TaskApp tasks={tasks} />
+      <TaskApp tasks={tasks}  onTaskUpdate={removeTaskFromList} />
+     <CompletedTasks />
+      
+      
+      {/*<TaskApp tasks={tasks} />
+      <CompletedTasks/>*/}
 
       {/* ChatBox component */}
       <ChatBox
