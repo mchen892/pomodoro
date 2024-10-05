@@ -88,19 +88,33 @@ export default function Home() {
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen bg-light text-darkBlueGray">
-      {/* Pomodoro Timer */}
-      <div className="flex flex-col items-center justify-center p-8 bg-softPurple rounded-lg shadow-md text-center">
-        <h1 className="text-4xl font-bold mb-4">Pomodoro Timer</h1>
-        <h2 className="text-6xl font-semibold">{formatTime(seconds)}</h2>
+      <div className="container">
+        <div className="leftcontainer">
+        <CompletedTasks />
+        </div>
+        <div className="rightcontainer">
+          <div className ="clockdiv">
+              {/* Pomodoro Timer */}
+            <div className="flex flex-col items-center justify-center p-8 bg-softPurple rounded-lg shadow-md text-center">
+              <h1 className="text-4xl font-bold mb-4">Pomodoro Timer</h1>
+              <h2 className="text-6xl font-semibold justify-center ">{formatTime(seconds)}</h2>
+            </div>
+            {/* Display current time */}
+            <p className="text-3xl mt-8 justify-center ">{currentTime}</p>
+              {/* Task form and task display */}
+          </div>
+         
+          <TaskForm onTaskSubmit={handleNewTask} />
+          <TaskApp tasks={tasks}  onTaskUpdate={removeTaskFromList} />
+        </div>
       </div>
+      
+      
 
-      {/* Display current time */}
-      <p className="text-3xl mt-8">{currentTime}</p>
+     
 
-      {/* Task form and task display */}
-      <TaskForm onTaskSubmit={handleNewTask} />
-      <TaskApp tasks={tasks}  onTaskUpdate={removeTaskFromList} />
-      <CompletedTasks />
+      
+      
 
       {/* ChatBox component */}
       <ChatBox
@@ -128,6 +142,55 @@ export default function Home() {
       </audio>
 
       <style jsx>{`
+
+      .container {
+        display: flex;
+        flex-direction: row;
+        justify-content: space-between;
+        width: 95%;
+        height: 100vh; /* Full height of the screen */
+        padding: 20px;
+        box-sizing: border-box; /* Ensures padding is inside the width */
+        max-width: 1800px; /* Limit the width of the container */
+      }
+
+      .leftcontainer {
+        flex: 1; /* Take up 1 part of the available space */
+        padding-right: 20px;
+        margin-left: 0;
+        margin-right: auto;
+        overflow-y: auto;
+        width: 90%;
+      }
+
+      .rightcontainer {
+        flex: 2; /* Take up 2 parts of the available space */
+        padding-left: 20px;
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-start;
+        margin-top: 60px;
+      }
+
+      .clockdiv{
+        width: 80%;
+        margin-left: auto;
+        margin-right: auto;
+        margin-bottom: 40px;
+        }
+
+      .timer-container {
+        margin-top: 60px;
+        margin-bottom: 40px;
+      }
+
+      p {
+        text-align: center; /* Center the time text */
+      }
+
+      
+ 
+
         .spotify-embed {
           position: absolute;
           bottom: 20px;
@@ -139,6 +202,8 @@ export default function Home() {
         .blink {
           animation: blink-animation 1s steps(2, start) infinite;
         }
+
+        
 
         @keyframes blink-animation {
           to {
