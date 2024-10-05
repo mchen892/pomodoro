@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import TaskForm from "../components/TaskForm";
 import TaskApp from "../components/TaskApp";
 import ChatBox from "./components/chatbox";
@@ -9,6 +9,8 @@ export default function Home() {
   const [seconds, setSeconds] = useState(1500);
   const [isFiveMinuteTimer, setIsFiveMinuteTimer] = useState(false);
   const [currentTime, setCurrentTime] = useState(new Date());
+
+  const audioRef = useRef<HTMLAudioElement>(null);
   const [tasks, setTasks] = useState([]);
   const [isChatOpen, setIsChatOpen] = useState(false); // Define isChatOpen and setIsChatOpen here
 
@@ -33,6 +35,9 @@ export default function Home() {
       }, 1000);
       return () => clearInterval(interval);
     } else {
+      if (audioRef.current) {
+        audioRef.current.play();
+      }
       // Switch between 25-minute and 5-minute timers
       setSeconds(isFiveMinuteTimer ? 1500 : 300);
       setIsFiveMinuteTimer(!isFiveMinuteTimer);
@@ -107,6 +112,17 @@ export default function Home() {
       />
 
       {/* Style for blink animation */}
+      {/* Display current time below the countdown */}
+      <p className="text-3xl mt-8">
+        {formatCurrentTime(currentTime)}
+      </p>
+
+      {/* Audio element for the sound */}
+      <audio ref={audioRef}>
+        <source src="/sounds/chime.mp3" type="audio/mp3" />
+        Your browser does not support the audio element.
+      </audio>
+
       <style jsx>{`
         .blink {
           animation: blink-animation 1s steps(2, start) infinite;
