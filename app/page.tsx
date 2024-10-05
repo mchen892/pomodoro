@@ -9,6 +9,7 @@ interface Task {
   task: string;
   status: string;
   createdAt: string;
+  ipAddress: string;
 }
 
 export default function Home() {
