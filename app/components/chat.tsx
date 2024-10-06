@@ -8,12 +8,12 @@ interface Message{
   message: string;
 }
 
-let socket: Socket; // Declare the socket variable outside the component
+let socket: Socket; 
 
 const usernames = ['Sarah', 'Amber', 'Maggie', 'Brooke'];
 
 function generateUsername() {
-  // Randomly select a username from the array
+  // Randomly select a username 
   const randomIndex = Math.floor(Math.random() * usernames.length);
   return usernames[randomIndex];
 }
@@ -23,22 +23,20 @@ const RealTimeChat = () => {
   const [input, setInput] = useState<string>('');
   const [username, setUsername] = useState<string>('');
 
-  // Initialize the Socket.io connection only once
   useEffect(() => {
     const newUsername = generateUsername();
     setUsername(newUsername);
 
     socket = io('https://pomopals-seven.vercel.app', {
-      transports: ['websocket'], // Ensure the websocket transport is used
-      reconnection: true,         // Enable reconnection
-      withCredentials: true,      // Allow cross-origin requests if needed
+      transports: ['websocket'], 
+      reconnection: true,        
+      withCredentials: true,      
     });
 
-    // Socket.io: Listen for incoming messages
     socket.on('message', (message: { username: string; message: string }) => {
-      console.log('Received message:', message); // Log received message
+      console.log('Received message:', message); 
       setMessages((prevMessages) => [...prevMessages, message]);
-      localStorage.setItem('latestMessage', JSON.stringify(message)); // Store incoming messages in local storage
+      localStorage.setItem('latestMessage', JSON.stringify(message)); 
     });
 
     // Listen for changes in local storage
@@ -46,8 +44,8 @@ const RealTimeChat = () => {
       if (e.key === 'latestMessage') {
           const newMessage = e.newValue;
           if (newMessage) {
-            const parsedMessage = JSON.parse(newMessage); // Parse the message
-            setMessages((prevMessages) => [...prevMessages, parsedMessage]); // Update state with parsed message
+            const parsedMessage = JSON.parse(newMessage); 
+            setMessages((prevMessages) => [...prevMessages, parsedMessage]); 
           }
       }
   };
@@ -55,7 +53,6 @@ const RealTimeChat = () => {
   window.addEventListener('storage', handleStorageChange);
 
 
-    // Cleanup the socket connection when the component unmounts
     return () => {
       if (socket) {
         socket.off('message');
@@ -65,19 +62,18 @@ const RealTimeChat = () => {
     };
   }, []);
 
-  // Handle user message submission via Socket.io
+  // Handle user message
   const sendMessage = (e: React.FormEvent) => {
     e.preventDefault();
     if (input) {
       const messageData = { username, message: input };
-      // Emit the message to the server
       socket.emit('message', messageData);
-      localStorage.setItem('latestMessage', JSON.stringify(messageData)); // Store in local storage
+      localStorage.setItem('latestMessage', JSON.stringify(messageData)); 
       setMessages((prevMessages) => [
         ...prevMessages,
-        { username: 'You', message: input }, // Store it as an object for uniformity
+        { username: 'You', message: input }, 
       ]);
-      setInput(''); // Clear the input field
+      setInput(''); 
     }
   };
 
