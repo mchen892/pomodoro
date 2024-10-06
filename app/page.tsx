@@ -22,6 +22,9 @@ export default function Home() {
   const audioRef = useRef<HTMLAudioElement>(null);
   const [tasks, setTasks] = useState<Task[]>([]);
   const [isChatOpen, setIsChatOpen] = useState(false);
+  const [backgroundImage, setBackgroundImage] = useState(
+    "/assets/Artboard1.jpg"
+  );
 
   const handleNewTask = (newTask : Task) => {
     // Here we assume the newTask contains the full task object (including _id from the database)
@@ -47,12 +50,13 @@ export default function Home() {
       }
       setSeconds(isFiveMinuteTimer ? 1500 : 300);
       setIsFiveMinuteTimer(!isFiveMinuteTimer);
+      setBackgroundImage(isFiveMinuteTimer ? '/assets/Artboard1.jpg' : '/assets/REPLACE.jpg');
     }
   }, [seconds, isFiveMinuteTimer]);
 
   useEffect(() => {
     const handleKeyDown = (event: { code: string }) => {
-      if (event.code === "Space") {
+      if (event.code === "Escape") {
         setSeconds(0);
       }
     };
@@ -87,7 +91,14 @@ export default function Home() {
   };
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen text-darkBlueGray">
+<div
+  className="flex flex-col items-center justify-center min-h-screen text-darkBlueGray"
+  style={{
+    backgroundImage: `url(${backgroundImage})`,
+    backgroundSize: 'cover',
+    backgroundPosition: 'center',
+  }}
+>
       <div className="container">
         <div className="leftcontainer">
         <CompletedTasks />
@@ -108,13 +119,6 @@ export default function Home() {
         </div>
       </div>
       
-      
-
-     
-
-      
-      
-
       {/* ChatBox component */}
       <ChatBox
         isChatOpen={isChatOpen}
