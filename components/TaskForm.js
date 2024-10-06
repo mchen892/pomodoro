@@ -1,9 +1,21 @@
 import { useState } from 'react';
 
+// Utility functions to get and set username in localStorage
+export function getUsernameFromBrowser() {
+  // Check if username already exists in localStorage
+  return localStorage.getItem('username');
+}
+
+export function saveUsernameToBrowser(username) {
+  // Save the assigned username in localStorage
+  localStorage.setItem('username', username);
+}
+
 const TaskForm = ({ onTaskSubmit }) => {
   const [task, setTask] = useState('');
 
-  
+  // Get the username from localStorage
+  let browserUsername = getUsernameFromBrowser();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -15,7 +27,7 @@ const TaskForm = ({ onTaskSubmit }) => {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ task,  status: 'pending' , createdAt: new Date() }),
+        body: JSON.stringify({ task, username: browserUsername, status: 'pending', createdAt: new Date() }),
       });
 
       if (!res.ok) {
@@ -25,80 +37,81 @@ const TaskForm = ({ onTaskSubmit }) => {
       const newTask = await res.json();
       onTaskSubmit(newTask);
       setTask('');
+
+      // If the server returns a new username, save it to localStorage
+      if (newTask.username) {
+        saveUsernameToBrowser(newTask.username);
+      }
     } catch (error) {
       console.error('Failed to submit task:', error);
     }
   };
 
   return (
-    
- 
     <div className='input'>
       <form onSubmit={handleSubmit} className='form'>
         <input
           type="text"
           className='inputBox'
-          value={task.task}
+          value={task}
           onChange={(e) => setTask(e.target.value)}
           placeholder="Enter your task"
         />
         <button type="submit">Add Task</button>
       </form>
 
-  
       <style jsx>{`
-  .input {
-    margin-top: 40px;
-    width: 100%;
-    margin-left: auto;
-    margin-right: auto;
-  }
+        .input {
+          margin-top: 40px;
+          width: 100%;
+          margin-left: auto;
+          margin-right: auto;
+        }
 
-  .form {
-    display: flex;
-    flex-direction: column; /* Stack input and button vertically */
-    align-items: center; /* Center items horizontally */
-    justify-content: center; /* Center items vertically */
-    width: 100%; 
-    max-width: 810px; /* Add a max width for better design */
-    margin: 0 auto; /* Center form in the container */
-  }
+        .form {
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          justify-content: center;
+          width: 80%; 
+          max-width: 900px;
+          margin: 0 auto;
+        }
 
-  .inputBox {
-    width: 100%; /* Make the input take up the full width of its container */
-    padding: 0.75rem;
-    margin-bottom: 1rem; /* Space between input and button */
-    border: 1px solid #495464; /* Simple black border */
-    border-radius: 0; /* No rounded corners for a sharp, modern look */
-    font-size: 1.25rem; /* Slightly larger for readability */
-    color: #000; /* Black text */
-    background-color: #fff; /* White background */
-    box-sizing: border-box; /* Ensure padding is inside the width */
-  }
+        .inputBox {
+          width: 100%;
+          padding: 0.75rem;
+          margin-bottom: 1rem;
+          border-radius: 0.75em;
+          font-size: 1.25rem;
+          color: #000;
+          background-color: #fff;
+          box-sizing: border-box;
+          box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05), 0 2px 4px rgba(0, 0, 0, 0.05);
+        }
 
-  .inputBox::placeholder {
-    color: #999; /* Light gray placeholder for a subtle effect */
-  }
+        .inputBox::placeholder {
+          color: #999;
+        }
 
-  button {
-    width: 100%; /* Make the button the same width as the input */
-    padding: 0.75rem;
-    background-color: #495464; /* Solid black button */
-    color: #fff; /* White text */
-    border: none; /* Remove borders */
-    border-radius: 0; /* No rounded corners for a modern look */
-    font-size: 1.25rem; /* Match the font size of the input */
-    cursor: pointer;
-  }
+        button {
+          width: 100%;
+          padding: 0.5rem;
+          background-color: rgba(73, 84, 100, 0.8);
+          color: #fff;
+          border: none;
+          border-radius: 1em;
+          font-size: 1.25rem;
+          cursor: pointer;
+          box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05), 0 2px 4px rgba(0, 0, 0, 0.05);
+        }
 
-  button:hover {
-    background-color: #333; /* Slightly lighter black for hover */
-  }
-`}</style>
-
-  </div>
-  
-    
+        button:hover {
+          background-color: #333;
+          box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05), 0 2px 4px rgba(0, 0, 0, 0.05);
+        }
+      `}</style>
+    </div>
   );
 };
 

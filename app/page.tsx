@@ -22,6 +22,9 @@ export default function Home() {
   const audioRef = useRef<HTMLAudioElement>(null);
   const [tasks, setTasks] = useState<Task[]>([]);
   const [isChatOpen, setIsChatOpen] = useState(false);
+  const [backgroundImage, setBackgroundImage] = useState(
+    "/assets/Artboard1.jpg"
+  );
 
   const handleNewTask = (newTask: Task) => {
     // Add new task
@@ -47,13 +50,14 @@ export default function Home() {
       }
       setSeconds(isFiveMinuteTimer ? 1500 : 300); // 1500 for 25 mins, 300 for 5 mins
       setIsFiveMinuteTimer(!isFiveMinuteTimer);
+      setBackgroundImage(isFiveMinuteTimer ? '/assets/Artboard1.jpg' : '/assets/REPLACE.jpg');
     }
   }, [seconds, isFiveMinuteTimer]);
 
   // Handle keyboard spacebar to reset timer
   useEffect(() => {
     const handleKeyDown = (event: { code: string }) => {
-      if (event.code === "Space") {
+      if (event.code === "Escape") {
         setSeconds(0);
       }
     };
@@ -90,7 +94,14 @@ export default function Home() {
   };
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen bg-light text-darkBlueGray">
+<div
+  className="flex flex-col items-center justify-center min-h-screen text-darkBlueGray"
+  style={{
+    backgroundImage: `url(${backgroundImage})`,
+    backgroundSize: 'cover',
+    backgroundPosition: 'center',
+  }}
+>
       <div className="container">
         <div className="leftcontainer">
           <CompletedTasks />

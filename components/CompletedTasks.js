@@ -69,15 +69,15 @@ const CompletedTasks = () => {
         }
 
         .task {
-          background-color: #eeeeee;
+          background-color: rgba(255, 255, 255, 0.6);
           color: #333;
           padding: 0.5em;
-          border-radius: 4px;
+          border-radius: 0.5em;
           transition: background-color 0.3s ease;
         }
 
         .task:hover {
-          background-color: #d4edda;
+          background-color: #f3f3f3;
         }
 
         .task p {
