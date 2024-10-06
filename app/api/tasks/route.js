@@ -12,7 +12,7 @@ function getRandomUsername(availableUsernames) {
 export async function POST(req) {
   try {
     const { db } = await connectToDatabase();
-    const { task, status } = await req.json(); // Parse the incoming request body
+    const { task, username, status } = await req.json(); // Parse the incoming request body
 
     // Validate the request body
     if (!task || !status) {
@@ -22,39 +22,19 @@ export async function POST(req) {
     // Extract the IP address from the request headers
     const ip = req.headers.get('x-forwarded-for') || req.headers.get('remote-addr') || 'Unknown';
 
-    // Check if the IP address already has a username
-    let user = await db.collection('users').findOne({ ipAddress: ip });
+    let assignedUsername = username;
 
-    // If no username exists for this IP, assign a new one and store it
-    if (!user) {
-      // Fetch all currently used usernames
-      const usedUsernames = await db.collection('users').find({}).toArray();
-      const usedUsernamesList = usedUsernames.map((user) => user.username);
-
-      // Get a list of available usernames
-      const availableUsernames = usernames.filter(
-        (username) => !usedUsernamesList.includes(username)
-      );
-
-      // If no usernames are available, respond with an error
-      if (availableUsernames.length === 0) {
-        return NextResponse.json({ message: 'No available usernames' }, { status: 500 });
-      }
-
-      // Assign a new username to the IP address
-      const assignedUsername = getRandomUsername(availableUsernames);
-
-      // Store the new username and IP in the `users` collection
-      await db.collection('users').insertOne({ ipAddress: ip, username: assignedUsername });
-
-      user = { username: assignedUsername };
+    // If no username is provided by the browser, assign a new one
+    if (!assignedUsername) {
+      assignedUsername = getRandomUsername(usernames);
     }
 
+  
     // Create a new task with the assigned or existing username
     const newTask = {
       task,
       status,
-      username: user.username, // Use the username for this IP
+      username: assignedUsername, // Use the username for this IP
       createdAt: new Date(),
       ipAddress: ip,
     };
