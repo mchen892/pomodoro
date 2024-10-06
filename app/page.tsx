@@ -50,7 +50,7 @@ export default function Home() {
       }
       setSeconds(isFiveMinuteTimer ? 1500 : 300); // 1500 for 25 mins, 300 for 5 mins
       setIsFiveMinuteTimer(!isFiveMinuteTimer);
-      setBackgroundImage(isFiveMinuteTimer ? '/assets/Artboard1.jpg' : '/assets/REPLACE.jpg');
+      setBackgroundImage(isFiveMinuteTimer ? '/assets/Artboard1.jpg' : '/assets/Artboard2.jpg');
     }
   }, [seconds, isFiveMinuteTimer]);
 

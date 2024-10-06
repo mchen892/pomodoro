@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server';
 import { connectToDatabase } from '@/lib/mongodb';
 
 // Predefined list of usernames
-const usernames = ['Alice', 'Bob', 'Charlie', 'Diana', 'Eva', 'Frank', 'Grace', 'Hank', 'Ivy', 'Jack'];
+const usernames = ['Sarah', 'Amber', 'Maggie', 'Brooke'];
 
 // Function to get a random username
 function getRandomUsername(availableUsernames) {

@@ -10,7 +10,7 @@ interface Message{
 
 let socket: Socket; // Declare the socket variable outside the component
 
-const usernames = ['Alice', 'Bob', 'Charlie', 'Diana', 'Eva', 'Frank', 'Grace', 'Hank', 'Ivy', 'Jack'];
+const usernames = ['Sarah', 'Amber', 'Maggie', 'Brooke'];
 
 function generateUsername() {
   // Randomly select a username from the array
