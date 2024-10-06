@@ -16,25 +16,24 @@ interface Task {
 }
 
 export default function Home() {
-  const [seconds, setSeconds] = useState(1500);
+  const [seconds, setSeconds] = useState(1500); // 25 minutes timer
   const [isFiveMinuteTimer, setIsFiveMinuteTimer] = useState(false);
   const [currentTime, setCurrentTime] = useState<string>("");
   const audioRef = useRef<HTMLAudioElement>(null);
   const [tasks, setTasks] = useState<Task[]>([]);
   const [isChatOpen, setIsChatOpen] = useState(false);
 
-  const handleNewTask = (newTask : Task) => {
-    // Here we assume the newTask contains the full task object (including _id from the database)
+  const handleNewTask = (newTask: Task) => {
+    // Add new task
     setTasks((prevTasks) => [...prevTasks, newTask]);
   };
-  
 
-  // Handle removing a task by its ID
-  const removeTaskFromList = (taskId : string) => {
-    // Remove the task with the given taskId from the state
-    setTasks(prevTasks => prevTasks.filter(task => task._id !== taskId));
+  // Remove task by ID
+  const removeTaskFromList = (taskId: string) => {
+    setTasks((prevTasks) => prevTasks.filter((task) => task._id !== taskId));
   };
 
+  // Timer logic
   useEffect(() => {
     if (seconds > 0) {
       const interval = setInterval(() => {
@@ -42,14 +41,16 @@ export default function Home() {
       }, 1000);
       return () => clearInterval(interval);
     } else {
+      // Play sound and switch between 25-minute and 5-minute timers
       if (audioRef.current) {
         audioRef.current.play();
       }
-      setSeconds(isFiveMinuteTimer ? 1500 : 300);
+      setSeconds(isFiveMinuteTimer ? 1500 : 300); // 1500 for 25 mins, 300 for 5 mins
       setIsFiveMinuteTimer(!isFiveMinuteTimer);
     }
   }, [seconds, isFiveMinuteTimer]);
 
+  // Handle keyboard spacebar to reset timer
   useEffect(() => {
     const handleKeyDown = (event: { code: string }) => {
       if (event.code === "Space") {
@@ -60,6 +61,7 @@ export default function Home() {
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, []);
 
+  // Update current time every second
   useEffect(() => {
     const updateCurrentTime = () => {
       const date = new Date();
@@ -80,6 +82,7 @@ export default function Home() {
     return () => clearInterval(interval);
   }, []);
 
+  // Format the timer in mm:ss format
   const formatTime = (seconds: number) => {
     const minutes = Math.floor(seconds / 60);
     const remainingSeconds = seconds % 60;
@@ -90,37 +93,35 @@ export default function Home() {
     <div className="flex flex-col items-center justify-center min-h-screen bg-light text-darkBlueGray">
       <div className="container">
         <div className="leftcontainer">
-        <CompletedTasks />
+          <CompletedTasks />
         </div>
         <div className="rightcontainer">
-          <div className ="clockdiv">
-              {/* Pomodoro Timer */}
+          <div className="clockdiv">
+            {/* Pomodoro Timer */}
             <div className="flex flex-col items-center justify-center p-8 bg-softPurple rounded-lg shadow-md text-center">
-              <h2 className="text-6xl font-semibold justify-center ">{formatTime(seconds)}</h2>
+              <h2 className="text-6xl font-semibold justify-center">
+                {formatTime(seconds)}
+              </h2>
             </div>
             {/* Display current time */}
-            <p className="text-3xl mt-8 justify-center ">{currentTime}</p>
-              {/* Task form and task display */}
+            <div className="flex justify-center mt-8">
+              <p className="text-3xl">{currentTime}</p>
+            </div>
           </div>
-         
+
           <TaskForm onTaskSubmit={handleNewTask} />
-          <TaskApp tasks={tasks}  onTaskUpdate={removeTaskFromList} />
+          <TaskApp tasks={tasks} onTaskUpdate={removeTaskFromList} />
         </div>
       </div>
-      
-      
 
-     
-
-      
-      
-
-      {/* ChatBox component */}
-      <ChatBox
-        isChatOpen={isChatOpen}
-        setIsChatOpen={setIsChatOpen}
-        sessionFeedback={(feedback) => console.log("Feedback:", feedback)}
-      />
+      {/* Conditionally Render ChatBox Toggle Button */}
+      {isFiveMinuteTimer && (
+        <ChatBox
+          isChatOpen={isChatOpen}
+          setIsChatOpen={setIsChatOpen}
+          sessionFeedback={(feedback) => console.log("Feedback:", feedback)}
+        />
+      )}
 
       {/* Spotify iframe */}
       <iframe
@@ -130,7 +131,7 @@ export default function Home() {
         height="80"
         frameBorder="0"
         allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
-        allowFullScreen // Fix the casing here
+        allowFullScreen
         loading="lazy"
       ></iframe>
 
@@ -141,73 +142,48 @@ export default function Home() {
       </audio>
 
       <style jsx>{`
-
-      .container {
-        display: flex;
-        flex-direction: row;
-        justify-content: space-between;
-        width: 95%;
-        height: 100vh; /* Full height of the screen */
-        padding: 20px 0;
-        box-sizing: border-box; /* Ensures padding is inside the width */
-        max-width: 1800px; /* Limit the width of the container */
-      }
-
-      .leftcontainer {
-        flex: 1; /* Take up 1 part of the available space */
-        padding-right: 20px;
-        margin-left: 0px;
-        margin-right: auto;
-        overflow-y: auto;
-        width: 90%;
-      }
-
-      .rightcontainer {
-        flex: 2; /* Take up 2 parts of the available space */
-        padding-left: 20px;
-        display: flex;
-        flex-direction: column;
-        justify-content: flex-start;
-        margin-top: 60px;
-      }
-
-      .clockdiv{
-        width: 80%;
-        margin-left: auto;
-        margin-right: auto;
-        margin-bottom: 40px;
+        .container {
+          display: flex;
+          flex-direction: row;
+          justify-content: space-between;
+          width: 95%;
+          height: 100vh;
+          padding: 20px 0;
+          box-sizing: border-box;
+          max-width: 1800px;
         }
 
-      .timer-container {
-        margin-top: 60px;
-        margin-bottom: 40px;
-      }
+        .leftcontainer {
+          flex: 1;
+          padding-right: 20px;
+          margin-left: 0px;
+          margin-right: auto;
+          overflow-y: auto;
+          width: 90%;
+        }
 
-      p {
-        text-align: center; /* Center the time text */
-      }
+        .rightcontainer {
+          flex: 2;
+          padding-left: 20px;
+          display: flex;
+          flex-direction: column;
+          justify-content: flex-start;
+          margin-top: 60px;
+        }
 
-      
- 
+        .clockdiv {
+          width: 80%;
+          margin-left: auto;
+          margin-right: auto;
+          margin-bottom: 40px;
+        }
 
         .spotify-embed {
           position: absolute;
           bottom: 20px;
           left: 20px;
           border-radius: 12px;
-          z-index: 1000; /* Ensure it's on top of other elements */
-        }
-
-        .blink {
-          animation: blink-animation 1s steps(2, start) infinite;
-        }
-
-        
-
-        @keyframes blink-animation {
-          to {
-            visibility: hidden;
-          }
+          z-index: 1000;
         }
       `}</style>
     </div>

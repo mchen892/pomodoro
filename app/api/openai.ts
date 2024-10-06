@@ -1,11 +1,8 @@
-// pages/api/openai.ts
-
 import type { NextApiRequest, NextApiResponse } from 'next';
 import OpenAI from 'openai';
 
-// Initialize OpenAI with the API key from environment variables
 const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY, // Make sure your API key is correctly set
+  apiKey: process.env.OPENAI_API_KEY,
 });
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
@@ -32,8 +29,15 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     const aiResponse = completion.choices[0].message;
 
     return res.status(200).json({ result: aiResponse }); // Send the AI response back to the client
-  } catch (error) {
-    console.error('Error with OpenAI API:', error);
+  } catch (error: any) {
+    console.error('Error with OpenAI API:', error.message); // Print error message to console
+    console.error('Error details:', error); // Print detailed error object for debugging
+
+    // Check if error has a response from OpenAI API
+    if (error.response) {
+      console.error('Response data:', error.response.data); // Print the response data from OpenAI
+    }
+
     return res.status(500).json({ message: 'Failed to fetch AI response' });
   }
 }
