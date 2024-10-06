@@ -87,7 +87,7 @@ export default function Home() {
   };
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen bg-light text-darkBlueGray">
+    <div className="flex flex-col items-center justify-center min-h-screen text-darkBlueGray">
       <div className="container">
         <div className="leftcontainer">
         <CompletedTasks />

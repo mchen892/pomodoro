@@ -16,10 +16,19 @@
 
 body {
   color: var(--foreground);
-  background: var(--background);
+  background-color: var(--background); /* Sets the background color for light and dark modes */
+  
+  /* Background image settings */
+  background-image: url('../public/assets/Artboard 1.jpg'); /* Corrected the path and handled space in the filename */
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  min-height: 100vh; /* Ensure the background covers the full viewport height */
+  
   font-family: Arial, Helvetica, sans-serif;
 }
 
+/* Custom Tailwind utility layer */
 @layer utilities {
   .text-balance {
     text-wrap: balance;

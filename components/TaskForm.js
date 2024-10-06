@@ -73,8 +73,8 @@ const TaskForm = ({ onTaskSubmit }) => {
           flex-direction: column;
           align-items: center;
           justify-content: center;
-          width: 100%; 
-          max-width: 810px;
+          width: 80%; 
+          max-width: 900px;
           margin: 0 auto;
         }
 
@@ -82,12 +82,12 @@ const TaskForm = ({ onTaskSubmit }) => {
           width: 100%;
           padding: 0.75rem;
           margin-bottom: 1rem;
-          border: 1px solid #495464;
-          border-radius: 0;
+          border-radius: 0.75em;
           font-size: 1.25rem;
           color: #000;
           background-color: #fff;
           box-sizing: border-box;
+          box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05), 0 2px 4px rgba(0, 0, 0, 0.05);
         }
 
         .inputBox::placeholder {
@@ -96,17 +96,19 @@ const TaskForm = ({ onTaskSubmit }) => {
 
         button {
           width: 100%;
-          padding: 0.75rem;
-          background-color: #495464;
+          padding: 0.5rem;
+          background-color: rgba(73, 84, 100, 0.8);
           color: #fff;
           border: none;
-          border-radius: 0;
+          border-radius: 1em;
           font-size: 1.25rem;
           cursor: pointer;
+          box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05), 0 2px 4px rgba(0, 0, 0, 0.05);
         }
 
         button:hover {
           background-color: #333;
+          box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05), 0 2px 4px rgba(0, 0, 0, 0.05);
         }
       `}</style>
     </div>
